@@ -59,7 +59,7 @@ prepare_server() {
     
     # Create remote deployment directory
     print_info "Creating deployment directory on remote server..."
-    ssh -p ${SSH_PORT:-22} "$REMOTE_USER@$REMOTE_HOST" "sudo mkdir -p $DEPLOY_DIR"
+    ssh -p ${SSH_PORT:-22} "$REMOTE_USER@$REMOTE_HOST" "mkdir -p $DEPLOY_DIR || sudo mkdir -p $DEPLOY_DIR"
     
     # Copy installation script to remote server
     print_info "Copying installation script to remote server..."
@@ -75,8 +75,8 @@ prepare_server() {
     print_info "This may take a while..."
     print_warning "You may be prompted for the sudo password on the remote server."
     
-    # Execute the script
-    ssh -t -p ${SSH_PORT:-22} "$REMOTE_USER@$REMOTE_HOST" "cd $DEPLOY_DIR && sudo ./install_docker_nvidia.sh"
+    # Execute the script with proper terminal allocation for sudo password prompt
+    ssh -t -p ${SSH_PORT:-22} "$REMOTE_USER@$REMOTE_HOST" "cd $DEPLOY_DIR && sudo -S ./install_docker_nvidia.sh"
     
     print_success "Remote server prepared successfully!"
 }
