@@ -34,3 +34,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Llama3 7B Q4 KM: Primary model (~4GB VRAM)
 - Phi3-mini: Lightweight alternative (~2GB VRAM)
 - Deepseek (quantized): For complex reasoning tasks (5-7GB VRAM)
+
+## Project Management
+- Use the taskmaster MCP to track progress on all tasks
+- Focus on the highest priority WIP (Work In Progress) item at all times
+- Update task status regularly to maintain accurate project visibility
