@@ -1,6 +1,6 @@
 <context>
 # Overview  
-This project aims to deploy OpenWebUI with a custom Ollama setup using Docker Compose. The solution addresses the need for a unified interface to interact with various local and cloud-hosted LLMs while leveraging GPU acceleration for optimal performance. This personal deployment will serve as a compatibility layer to share context between different LLMs for work-related tasks, with a focus on being easy to deploy on a clean Ubuntu system.
+This project aims to deploy OpenWebUI with a custom Ollama setup using Docker Compose with a Kamal-like deployment experience. The solution addresses the need for a unified interface to interact with various local and cloud-hosted LLMs while leveraging GPU acceleration for optimal performance. This personal deployment will serve as a compatibility layer to share context between different LLMs for work-related tasks, with a focus on being easy to deploy on a clean Ubuntu system from a local machine with a single command.
 
 # Core Features  
 - OpenWebUI deployment with Docker Compose for easy management
@@ -9,6 +9,7 @@ This project aims to deploy OpenWebUI with a custom Ollama setup using Docker Co
 - Voice chat capabilities
 - Workspace organization for retrieval-augmented generation
 - Context sharing between different LLMs
+- Single-command deployment from local machine to remote server
 
 # User Experience  
 - Personal use with potential family access on local network
@@ -16,6 +17,7 @@ This project aims to deploy OpenWebUI with a custom Ollama setup using Docker Co
 - Organized workspaces for different use cases
 - Seamless switching between local and cloud LLMs
 - No need for external authentication in MVP (behind firewall)
+- Developer-friendly deployment process similar to Kamal/Capistrano
 </context>
 <PRD>
 # Technical Architecture  
@@ -23,6 +25,7 @@ This project aims to deploy OpenWebUI with a custom Ollama setup using Docker Co
   - OpenWebUI container managed by Docker Compose
   - Standard Ollama Docker container with GPU acceleration
   - Docker Compose configuration for service orchestration
+  - Local deployment CLI tool for remote server setup
   - Installation scripts for Docker and NVIDIA drivers/runtime
 
 - Data Models:
@@ -41,14 +44,17 @@ This project aims to deploy OpenWebUI with a custom Ollama setup using Docker Co
   - 128GB RAM
   - Ubuntu Linux (distro-agnostic approach for future)
   - Local network deployment with firewall protection
+  - SSH access from local development machine to target server
 
 # Development Roadmap  
 ## MVP Requirements
 1. Basic Deployment Setup
-   - Installation script for Docker and NVIDIA Container Toolkit
+   - Local CLI tool for remote deployment (similar to Kamal)
+   - Remote installation script for Docker and NVIDIA Container Toolkit
    - Docker Compose configuration for OpenWebUI and Ollama
    - Volume configuration for persistent storage
    - Environment variable management
+   - Single-command deployment from local machine
 
 2. Model Integration
    - Configure and test Llama3 7B Q4 KM as primary model
@@ -78,14 +84,22 @@ This project aims to deploy OpenWebUI with a custom Ollama setup using Docker Co
    - Multi-user profile management for family members
    - Distro-agnostic deployment scripts
 
+4. Deployment Tooling Improvements
+   - Rolling updates with zero downtime
+   - Deployment history and rollback capabilities
+   - Health monitoring and automatic recovery
+   - Configuration templates for different server types
+
 # Logical Dependency Chain
 1. Foundation (Phase 1)
-   - Create installation script for Docker and NVIDIA Container Toolkit
+   - Create local deployment CLI tool
+   - Develop remote installation script for Docker and NVIDIA Container Toolkit
    - Test Docker installation with basic containers
    - Verify GPU passthrough functionality
    - Create docker-compose.yml file for services
 
 2. Core Functionality (Phase 2)
+   - Implement remote deployment workflow
    - Deploy Ollama container with GPU passthrough
    - Configure volume for model persistence
    - Download and configure initial Llama3 7B Q4 KM model
@@ -116,6 +130,10 @@ This project aims to deploy OpenWebUI with a custom Ollama setup using Docker Co
    - Risk: Memory limitations with larger models like Deepseek
      - Mitigation: Implement appropriate quantization levels
      - Mitigation: Configure resource limits in docker-compose.yml
+   
+   - Risk: SSH connectivity and remote execution issues
+     - Mitigation: Implement robust error handling in deployment tool
+     - Mitigation: Provide clear feedback on connection issues
 
 2. MVP Scope
    - Risk: Feature creep extending development time
@@ -137,10 +155,99 @@ This project aims to deploy OpenWebUI with a custom Ollama setup using Docker Co
 
 # Appendix  
 - Technical Specifications
-  - Docker Installation Script Example:
+  - Local Deployment CLI Example:
     ```bash
     #!/bin/bash
-    # Script to install Docker and NVIDIA Container Toolkit on Ubuntu
+    # deploy.sh - A simple deployment tool for OpenWebUI and Ollama
+    
+    # Configuration
+    SERVER_HOST="user@server.example.com"
+    DEPLOY_DIR="/opt/openwebui-ollama"
+    
+    # Command line parsing
+    ACTION=$1
+    
+    function usage {
+      echo "Usage: ./deploy.sh [setup|deploy|status|logs|ssh]"
+      echo "  setup  - Install Docker, NVIDIA toolkit, and set up initial configuration"
+      echo "  deploy - Deploy or update the application"
+      echo "  status - Check status of running containers"
+      echo "  logs   - View logs from containers"
+      echo "  ssh    - Open SSH session to the server"
+      exit 1
+    }
+    
+    function run_remote {
+      ssh $SERVER_HOST "$1"
+    }
+    
+    function setup {
+      echo "Setting up server environment..."
+      
+      # Create remote directory
+      run_remote "mkdir -p $DEPLOY_DIR"
+      
+      # Copy installation script
+      scp ./scripts/install_docker_nvidia.sh $SERVER_HOST:$DEPLOY_DIR/
+      
+      # Run installation script
+      run_remote "cd $DEPLOY_DIR && chmod +x install_docker_nvidia.sh && ./install_docker_nvidia.sh"
+      
+      # Copy docker-compose.yml
+      scp ./docker-compose.yml $SERVER_HOST:$DEPLOY_DIR/
+      
+      echo "Setup complete!"
+    }
+    
+    function deploy {
+      echo "Deploying application..."
+      
+      # Copy latest docker-compose.yml
+      scp ./docker-compose.yml $SERVER_HOST:$DEPLOY_DIR/
+      
+      # Run docker-compose
+      run_remote "cd $DEPLOY_DIR && docker-compose up -d"
+      
+      echo "Deployment complete!"
+    }
+    
+    function status {
+      echo "Checking container status..."
+      run_remote "cd $DEPLOY_DIR && docker-compose ps"
+    }
+    
+    function logs {
+      echo "Fetching logs..."
+      run_remote "cd $DEPLOY_DIR && docker-compose logs"
+    }
+    
+    # Main execution
+    case $ACTION in
+      setup)
+        setup
+        ;;
+      deploy)
+        deploy
+        ;;
+      status)
+        status
+        ;;
+      logs)
+        logs
+        ;;
+      ssh)
+        ssh $SERVER_HOST
+        ;;
+      *)
+        usage
+        ;;
+    esac
+    ```
+  
+  - Remote Installation Script:
+    ```bash
+    #!/bin/bash
+    # install_docker_nvidia.sh - Script to install Docker and NVIDIA Container Toolkit on Ubuntu
     
     # Update package index
     sudo apt-get update
