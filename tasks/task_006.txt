@@ -1,0 +1,11 @@
+# Task ID: 6
+# Title: Set Up Additional Models (Phi3-mini and Deepseek)
+# Status: pending
+# Dependencies: 5
+# Priority: medium
+# Description: Configure and test Phi3-mini as a lightweight alternative and Deepseek for complex reasoning tasks.
+# Details:
+Extend the model configuration script to include Phi3-mini and a quantized version of Deepseek. For each model: 1) Implement appropriate download and configuration, 2) Optimize parameters for the RTX 3070 GPU, 3) Configure resource allocation to prevent VRAM overflow, 4) Document memory usage and performance characteristics. Consider implementing a model rotation strategy if all three models cannot be loaded simultaneously due to memory constraints.
+
+# Test Strategy:
+Test each model individually for successful loading and basic inference. Measure and document VRAM usage for each model. Test switching between models to ensure smooth transitions. Verify that Deepseek works within the 8GB VRAM limitation through appropriate quantization.

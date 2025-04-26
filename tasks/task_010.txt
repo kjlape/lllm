@@ -1,0 +1,11 @@
+# Task ID: 10
+# Title: Implement Context Sharing Between Different LLMs
+# Status: pending
+# Dependencies: 6, 9
+# Priority: low
+# Description: Enable and test functionality for sharing context between different LLM models in OpenWebUI.
+# Details:
+Configure OpenWebUI to maintain conversation context when switching between different LLM models (Llama3, Phi3-mini, Deepseek). This may involve: 1) Understanding how OpenWebUI handles context between model switches, 2) Configuring any necessary settings to preserve context, 3) Testing context retention with different conversation lengths and complexities, 4) Documenting any limitations or best practices for context sharing. Optimize the context length based on each model's capabilities and memory constraints.
+
+# Test Strategy:
+Start conversations with one model, then switch to another model mid-conversation to verify context retention. Test with increasingly complex contexts to determine limitations. Document the maximum effective context length that can be shared between models.

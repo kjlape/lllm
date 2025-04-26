@@ -1,0 +1,11 @@
+# Task ID: 3
+# Title: Create Docker Compose Configuration
+# Status: pending
+# Dependencies: None
+# Priority: high
+# Description: Create a docker-compose.yml file that defines the OpenWebUI and Ollama services with proper configuration for GPU acceleration and persistent storage.
+# Details:
+Start with the provided Docker Compose example in the appendix. Ensure the configuration includes: 1) Ollama service with GPU passthrough, 2) OpenWebUI service connected to Ollama, 3) Volume configuration for persistent storage of models and user data, 4) Port mappings for accessing the services, 5) Environment variables for OpenWebUI configuration, 6) Resource limits for memory and CPU usage, 7) Restart policies for reliability. Add comments to explain each section of the configuration.
+
+# Test Strategy:
+Validate the docker-compose.yml file syntax. Test locally if possible to ensure services start properly and can communicate with each other. Verify volumes are created and persist data across container restarts.

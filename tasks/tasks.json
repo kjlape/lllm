@@ -1,0 +1,216 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Create Local Deployment CLI Tool",
+      "description": "Develop a bash script that enables single-command deployment from a local machine to a remote server, following the Kamal-like deployment experience.",
+      "status": "done",
+      "dependencies": [],
+      "priority": "high",
+      "details": "Start with the provided CLI example in the appendix. Implement all required functions: setup, deploy, status, logs, and ssh. Add proper error handling, command-line argument validation, and clear output messages. The script should handle SSH connectivity to the remote server and include configuration variables for server host, deployment directory, and other customizable parameters. Make sure the script is executable and properly documented.",
+      "testStrategy": "Test each function individually with a test server. Verify SSH connectivity, proper command execution, and error handling when the server is unreachable or commands fail.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement Core CLI Structure with Configuration Management",
+          "description": "Create the foundation of the bash script with command parsing, help documentation, and configuration management for deployment parameters.",
+          "dependencies": [],
+          "details": "1. Create a new bash script file with proper shebang (#!/bin/bash)\n2. Implement configuration management to store and retrieve server host, deployment directory, and other parameters\n3. Create a function to parse command-line arguments and route to appropriate functions\n4. Implement the help command to display usage instructions\n5. Add basic error handling for invalid commands and missing arguments\n6. Create configuration file structure (.env or config.yml) to store deployment variables\n7. Implement validation for required configuration variables\n8. Add utility functions for colorized output messages\n9. Make the script executable (chmod +x)\n10. Test the basic CLI structure by running help command and checking for proper output\n11. Document the configuration options and basic usage in a README.md file",
+          "status": "done",
+          "parentTaskId": 1
+        },
+        {
+          "id": 2,
+          "title": "Implement Core Deployment Functions",
+          "description": "Develop the primary deployment functions: setup, deploy, and ssh commands that handle remote server connectivity and deployment tasks.",
+          "dependencies": [
+            1
+          ],
+          "details": "1. Implement the 'setup' function to initialize the remote server environment\n   - Add SSH connectivity check to verify server access\n   - Create necessary directories on the remote server\n   - Set up any required dependencies on the remote server\n2. Implement the 'deploy' function for application deployment\n   - Add file transfer functionality using rsync or scp\n   - Include deployment steps (stopping services, copying files, restarting services)\n   - Add rollback capability in case of deployment failure\n3. Implement the 'ssh' function to provide direct shell access to the server\n   - Create a wrapper around the SSH command with proper authentication\n   - Add support for executing specific commands remotely\n4. Add proper error handling for network issues and remote execution failures\n5. Implement progress indicators for long-running operations\n6. Test each function with minimal configuration to ensure proper connectivity\n7. Document each function's parameters and behavior",
+          "status": "done",
+          "parentTaskId": 1
+        },
+        {
+          "id": 3,
+          "title": "Implement Monitoring and Logging Functions with Documentation",
+          "description": "Complete the CLI tool by adding status and logs commands, finalizing documentation, and adding comprehensive error handling and validation.",
+          "dependencies": [
+            1,
+            2
+          ],
+          "details": "1. Implement the 'status' function to check deployment status\n   - Add remote service status checking\n   - Display uptime and health information\n   - Implement formatted output for status information\n2. Implement the 'logs' function to view application logs\n   - Add functionality to stream logs from remote server\n   - Include options for filtering logs (tail, grep, etc.)\n   - Support following logs in real-time\n3. Enhance error handling across all functions\n   - Add detailed error messages with troubleshooting hints\n   - Implement proper exit codes for different error scenarios\n4. Add comprehensive validation for all command-line arguments\n5. Create detailed documentation with examples for each command\n6. Add a version command to display the tool version\n7. Implement unit tests for critical functions\n8. Create integration tests for end-to-end deployment scenarios\n9. Add a command completion script for bash/zsh\n10. Finalize the README with complete usage instructions, configuration options, and troubleshooting tips",
+          "status": "done",
+          "parentTaskId": 1
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Create Remote Installation Script for Docker and NVIDIA Container Toolkit",
+      "description": "Develop a bash script that installs Docker, Docker Compose, and NVIDIA Container Toolkit on the remote Ubuntu server.",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "high",
+      "details": "Start with the provided installation script in the appendix. Enhance it with better error handling and verification steps. The script should check if components are already installed before attempting installation. Add verification steps to confirm Docker is running properly, the user has been added to the docker group, and the NVIDIA Container Toolkit is correctly configured. Include a simple test to verify GPU passthrough functionality using a basic container like nvidia/cuda:11.0-base with nvidia-smi command.",
+      "testStrategy": "Run the script on a clean Ubuntu system and verify that all components are installed correctly. Test Docker functionality by running a simple container. Verify GPU passthrough by running a container with nvidia-smi command.",
+      "subtasks": [
+        {
+          "id": 1,
+          "title": "Implement prerequisite checks and environment validation",
+          "description": "Create initial script section that checks system requirements, validates Ubuntu version, and determines if components are already installed before proceeding with installation",
+          "dependencies": [],
+          "details": "Implementation steps:\n1. Create the script header with proper shebang and script metadata\n2. Implement functions to check Ubuntu version compatibility\n3. Create functions to detect if Docker, Docker Compose, and NVIDIA Container Toolkit are already installed\n4. Add GPU detection to verify NVIDIA hardware is present\n5. Implement comprehensive logging functionality\n6. Add command-line parameters for options like force reinstall and verbose output\n7. Testing approach: Run on systems with and without components installed to verify proper detection",
+          "status": "done",
+          "parentTaskId": 2
+        },
+        {
+          "id": 2,
+          "title": "Develop Docker installation with error handling",
+          "description": "Create the Docker installation section with proper error handling, rollback capabilities, and verification steps",
+          "dependencies": [
+            1
+          ],
+          "details": "Implementation steps:\n1. Create a function to install Docker using official repository method\n2. Implement error handling for each installation step (apt update, key import, repository addition, installation)\n3. Add verification to confirm Docker daemon is running properly after installation\n4. Implement user addition to the docker group with verification\n5. Create rollback functionality to revert changes if installation fails\n6. Add proper exit codes for different failure scenarios\n7. Testing approach: Test installation on clean system and verify Docker runs with 'docker run hello-world'",
+          "status": "pending",
+          "parentTaskId": 2
+        },
+        {
+          "id": 3,
+          "title": "Implement Docker Compose installation module",
+          "description": "Create the Docker Compose installation section with version detection, binary installation, and permission setting",
+          "dependencies": [
+            2
+          ],
+          "details": "Implementation steps:\n1. Create a function to detect latest stable Docker Compose version\n2. Implement download and installation of Docker Compose binary to /usr/local/bin\n3. Add proper permission setting for the binary\n4. Implement verification that Docker Compose works correctly\n5. Add error handling for network issues during download\n6. Implement version comparison if Docker Compose is already installed\n7. Testing approach: Verify Docker Compose installation with 'docker-compose version' and test a simple compose file",
+          "status": "pending",
+          "parentTaskId": 2
+        },
+        {
+          "id": 4,
+          "title": "Develop NVIDIA Container Toolkit installation with validation",
+          "description": "Create the NVIDIA Container Toolkit installation section with dependency checking, proper repository setup, and configuration validation",
+          "dependencies": [
+            2
+          ],
+          "details": "Implementation steps:\n1. Implement NVIDIA driver detection and version compatibility check\n2. Create function to add NVIDIA Container Toolkit repository\n3. Implement installation of nvidia-container-toolkit package\n4. Add Docker daemon configuration for NVIDIA runtime\n5. Implement Docker service restart with failure detection\n6. Create validation that NVIDIA runtime is properly configured\n7. Testing approach: Check configuration files and verify runtime is listed in 'docker info'",
+          "status": "pending",
+          "parentTaskId": 2
+        },
+        {
+          "id": 5,
+          "title": "Implement GPU passthrough testing and final verification",
+          "description": "Create comprehensive testing section that verifies GPU passthrough functionality with a test container and provides final installation report",
+          "dependencies": [
+            4
+          ],
+          "details": "Implementation steps:\n1. Implement function to pull nvidia/cuda:11.0-base test container\n2. Create test that runs nvidia-smi inside the container to verify GPU access\n3. Implement parsing of nvidia-smi output to confirm proper functionality\n4. Add comprehensive final verification that checks all components are working together\n5. Create detailed installation report showing versions and status of all components\n6. Implement cleanup of test containers and temporary files\n7. Testing approach: Verify full GPU passthrough works by running container with nvidia-smi and checking for expected GPU information",
+          "status": "pending",
+          "parentTaskId": 2
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Create Docker Compose Configuration",
+      "description": "Create a docker-compose.yml file that defines the OpenWebUI and Ollama services with proper configuration for GPU acceleration and persistent storage.",
+      "status": "pending",
+      "dependencies": [],
+      "priority": "high",
+      "details": "Start with the provided Docker Compose example in the appendix. Ensure the configuration includes: 1) Ollama service with GPU passthrough, 2) OpenWebUI service connected to Ollama, 3) Volume configuration for persistent storage of models and user data, 4) Port mappings for accessing the services, 5) Environment variables for OpenWebUI configuration, 6) Resource limits for memory and CPU usage, 7) Restart policies for reliability. Add comments to explain each section of the configuration.",
+      "testStrategy": "Validate the docker-compose.yml file syntax. Test locally if possible to ensure services start properly and can communicate with each other. Verify volumes are created and persist data across container restarts."
+    },
+    {
+      "id": 4,
+      "title": "Implement Remote Deployment Workflow",
+      "description": "Integrate the local CLI tool, remote installation script, and Docker Compose configuration to create a seamless deployment workflow.",
+      "status": "pending",
+      "dependencies": [
+        1,
+        2,
+        3
+      ],
+      "priority": "high",
+      "details": "Enhance the local CLI tool to handle the complete deployment workflow: 1) Copying necessary files to the remote server, 2) Executing the installation script if needed, 3) Deploying the Docker Compose configuration, 4) Verifying services are running properly. Add a new command 'deploy:setup' that performs the complete initial setup and deployment in one step. Ensure the tool provides clear feedback throughout the process and handles errors gracefully.",
+      "testStrategy": "Test the complete deployment workflow on a clean Ubuntu server. Verify that the workflow can be executed with a single command and results in a working deployment. Test error scenarios such as network interruptions or insufficient server resources."
+    },
+    {
+      "id": 5,
+      "title": "Configure Ollama with Initial Models",
+      "description": "Implement model download and configuration for Llama3 7B Q4 KM as the primary model in the Ollama container.",
+      "status": "pending",
+      "dependencies": [
+        4
+      ],
+      "priority": "high",
+      "details": "Create a script that runs inside the Ollama container to download and configure the Llama3 7B Q4 KM model. The script should: 1) Check if the model is already downloaded, 2) Download the model if needed, 3) Configure the model with appropriate parameters for the RTX 3070 GPU, 4) Verify the model loads correctly. Add this script to the deployment workflow, either as part of the Docker Compose configuration or as a post-deployment step in the CLI tool.",
+      "testStrategy": "Verify the model downloads correctly and is accessible through the Ollama API. Test model loading and basic inference to ensure it works with the GPU. Monitor GPU memory usage to ensure it stays within the 8GB VRAM limit."
+    },
+    {
+      "id": 6,
+      "title": "Set Up Additional Models (Phi3-mini and Deepseek)",
+      "description": "Configure and test Phi3-mini as a lightweight alternative and Deepseek for complex reasoning tasks.",
+      "status": "pending",
+      "dependencies": [
+        5
+      ],
+      "priority": "medium",
+      "details": "Extend the model configuration script to include Phi3-mini and a quantized version of Deepseek. For each model: 1) Implement appropriate download and configuration, 2) Optimize parameters for the RTX 3070 GPU, 3) Configure resource allocation to prevent VRAM overflow, 4) Document memory usage and performance characteristics. Consider implementing a model rotation strategy if all three models cannot be loaded simultaneously due to memory constraints.",
+      "testStrategy": "Test each model individually for successful loading and basic inference. Measure and document VRAM usage for each model. Test switching between models to ensure smooth transitions. Verify that Deepseek works within the 8GB VRAM limitation through appropriate quantization."
+    },
+    {
+      "id": 7,
+      "title": "Configure OpenWebUI with SQLite Backend",
+      "description": "Set up OpenWebUI with a SQLite backend for persistent storage of user data and conversations.",
+      "status": "pending",
+      "dependencies": [
+        4
+      ],
+      "priority": "high",
+      "details": "Configure the OpenWebUI container to use SQLite for persistent storage. Ensure the database file is stored in a mounted volume to persist across container restarts and redeployments. Configure environment variables in the Docker Compose file to specify the database location and other OpenWebUI settings. Verify that user conversations and settings are preserved across container restarts.",
+      "testStrategy": "Create test conversations and settings in OpenWebUI, then restart the container to verify persistence. Check that the SQLite database is being properly saved to the mounted volume. Verify database integrity after multiple restarts."
+    },
+    {
+      "id": 8,
+      "title": "Enable Voice Chat Functionality",
+      "description": "Configure and test voice chat capabilities in OpenWebUI for speech-to-text and text-to-speech interaction.",
+      "status": "pending",
+      "dependencies": [
+        7
+      ],
+      "priority": "medium",
+      "details": "Enable voice chat functionality in OpenWebUI by configuring the appropriate settings. This may involve: 1) Enabling built-in voice features in OpenWebUI, 2) Configuring any necessary environment variables in the Docker Compose file, 3) Testing both speech-to-text (user input) and text-to-speech (AI responses) functionality, 4) Optimizing voice quality and responsiveness. Document any limitations or requirements for using voice features.",
+      "testStrategy": "Test voice input and output functionality through the OpenWebUI interface. Verify that speech recognition works correctly and that text-to-speech output is clear and natural. Test with different browsers and devices on the local network."
+    },
+    {
+      "id": 9,
+      "title": "Set Up Workspace Organization for RAG",
+      "description": "Configure personal workspaces in OpenWebUI for retrieval-augmented generation and context organization.",
+      "status": "pending",
+      "dependencies": [
+        7
+      ],
+      "priority": "medium",
+      "details": "Set up and configure workspaces in OpenWebUI for different use cases. For each workspace: 1) Configure appropriate settings for the intended use case, 2) Set up folders or categories for organizing conversations, 3) Configure retrieval-augmented generation features if available, 4) Test context retention within and between conversations. Document the workspace structure and provide examples of effective organization for different types of tasks.",
+      "testStrategy": "Create test workspaces for different scenarios (e.g., coding, writing, research). Test the organization features and verify that context is properly maintained within workspaces. Test retrieval capabilities by referencing information from previous conversations."
+    },
+    {
+      "id": 10,
+      "title": "Implement Context Sharing Between Different LLMs",
+      "description": "Enable and test functionality for sharing context between different LLM models in OpenWebUI.",
+      "status": "pending",
+      "dependencies": [
+        6,
+        9
+      ],
+      "priority": "low",
+      "details": "Configure OpenWebUI to maintain conversation context when switching between different LLM models (Llama3, Phi3-mini, Deepseek). This may involve: 1) Understanding how OpenWebUI handles context between model switches, 2) Configuring any necessary settings to preserve context, 3) Testing context retention with different conversation lengths and complexities, 4) Documenting any limitations or best practices for context sharing. Optimize the context length based on each model's capabilities and memory constraints.",
+      "testStrategy": "Start conversations with one model, then switch to another model mid-conversation to verify context retention. Test with increasingly complex contexts to determine limitations. Document the maximum effective context length that can be shared between models."
+    }
+  ],
+  "metadata": {
+    "projectName": "OpenWebUI with Ollama Docker Compose Deployment",
+    "totalTasks": 10,
+    "sourceFile": "scripts/mvp_docker_compose_prd.txt",
+    "generatedAt": "2023-12-04"
+  }
+}

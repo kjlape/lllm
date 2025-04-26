@@ -1,0 +1,11 @@
+# Task ID: 5
+# Title: Configure Ollama with Initial Models
+# Status: pending
+# Dependencies: 4
+# Priority: high
+# Description: Implement model download and configuration for Llama3 7B Q4 KM as the primary model in the Ollama container.
+# Details:
+Create a script that runs inside the Ollama container to download and configure the Llama3 7B Q4 KM model. The script should: 1) Check if the model is already downloaded, 2) Download the model if needed, 3) Configure the model with appropriate parameters for the RTX 3070 GPU, 4) Verify the model loads correctly. Add this script to the deployment workflow, either as part of the Docker Compose configuration or as a post-deployment step in the CLI tool.
+
+# Test Strategy:
+Verify the model downloads correctly and is accessible through the Ollama API. Test model loading and basic inference to ensure it works with the GPU. Monitor GPU memory usage to ensure it stays within the 8GB VRAM limit.
