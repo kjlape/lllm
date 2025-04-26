@@ -4,25 +4,33 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 - Deployment project for OpenWebUI with Ollama and GPU support
-- Uses Kamal for containerized deployment management
-- Includes Docker configurations for services
+- Uses Docker Compose with a Kamal-like deployment experience
+- Custom local CLI tool for remote deployment
+- Includes Docker configurations for services with GPU acceleration
 
 ## Commands
-- `kamal setup` - Prepare the target server environment
-- `kamal deploy` - Deploy the application
-- `kamal logs` - View deployment logs
-- `kamal app status` - Check container status
-- `kamal setup check` - Validate configuration
-- `kamal validate` - Validate deployment.yml syntax
+- `./deploy.sh setup` - Install Docker, NVIDIA toolkit, and set up initial configuration
+- `./deploy.sh deploy` - Deploy or update the application
+- `./deploy.sh status` - Check status of running containers
+- `./deploy.sh logs` - View logs from containers
+- `./deploy.sh ssh` - Open SSH session to the server
 
 ## Code Style Guidelines
 - Follow Docker best practices for containerization
-- Use YAML indentation of 2 spaces for Kamal configuration files
+- Use YAML indentation of 2 spaces for Docker Compose configuration files
 - Bash scripts should be executable (chmod +x) with proper shebang
 - Use volumes for persistent data storage
-- Include appropriate error handling in hook scripts
+- Include appropriate error handling in deployment scripts
+- Maintain clear separation between installation and deployment logic
 
 ## Dependencies
-- Kamal deployment tool (Ruby gem)
-- Docker for containerization
-- NVIDIA GPU with proper drivers for Ollama GPU support
+- Docker and Docker Compose for containerization
+- NVIDIA Container Toolkit for GPU passthrough
+- SSH access from local development machine to target server
+- NVIDIA RTX 3070 GPU with proper drivers for Ollama GPU support
+- Ubuntu Linux on target server
+
+## Models
+- Llama3 7B Q4 KM: Primary model (~4GB VRAM)
+- Phi3-mini: Lightweight alternative (~2GB VRAM)
+- Deepseek (quantized): For complex reasoning tasks (5-7GB VRAM)
