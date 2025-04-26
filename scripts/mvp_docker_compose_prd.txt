@@ -1,0 +1,233 @@
+<context>
+# Overview  
+This project aims to deploy OpenWebUI with a custom Ollama setup using Docker Compose. The solution addresses the need for a unified interface to interact with various local and cloud-hosted LLMs while leveraging GPU acceleration for optimal performance. This personal deployment will serve as a compatibility layer to share context between different LLMs for work-related tasks, with a focus on being easy to deploy on a clean Ubuntu system.
+
+# Core Features  
+- OpenWebUI deployment with Docker Compose for easy management
+- Custom Ollama setup with GPU acceleration
+- Multiple LLM model support (Llama3, Phi3-mini, Deepseek)
+- Voice chat capabilities
+- Workspace organization for retrieval-augmented generation
+- Context sharing between different LLMs
+
+# User Experience  
+- Personal use with potential family access on local network
+- Voice and text interaction options
+- Organized workspaces for different use cases
+- Seamless switching between local and cloud LLMs
+- No need for external authentication in MVP (behind firewall)
+</context>
+<PRD>
+# Technical Architecture  
+- System Components:
+  - OpenWebUI container managed by Docker Compose
+  - Standard Ollama Docker container with GPU acceleration
+  - Docker Compose configuration for service orchestration
+  - Installation scripts for Docker and NVIDIA drivers/runtime
+
+- Data Models:
+  - Initial Ollama models: Llama3 7B Q4 KM, Phi3-mini, and Deepseek (moderately quantized)
+  - User workspaces for RAG (Retrieval-Augmented Generation)
+  - Context sharing between different LLMs
+
+- APIs and Integrations:
+  - OpenWebUI's authenticated API layer
+  - Integration with both local Ollama models and cloud-hosted LLMs
+  - Voice chat integration
+
+- Infrastructure Requirements:
+  - Nvidia RTX 3070 GPU with 8GB VRAM
+  - Ryzen 9 CPU (16 cores)
+  - 128GB RAM
+  - Ubuntu Linux (distro-agnostic approach for future)
+  - Local network deployment with firewall protection
+
+# Development Roadmap  
+## MVP Requirements
+1. Basic Deployment Setup
+   - Installation script for Docker and NVIDIA Container Toolkit
+   - Docker Compose configuration for OpenWebUI and Ollama
+   - Volume configuration for persistent storage
+   - Environment variable management
+
+2. Model Integration
+   - Configure and test Llama3 7B Q4 KM as primary model
+   - Set up Phi3-mini as a lightweight alternative
+   - Experiment with Deepseek for complex reasoning tasks
+   - Performance optimization for the RTX 3070
+
+3. User Interface
+   - Default OpenWebUI configuration with SQLite backend
+   - Basic workspace setup for personal use
+   - Voice chat functionality enabled
+
+## Future Enhancements
+1. Advanced Model Management
+   - Automated model downloading and updating
+   - Model performance analytics and comparison tools
+   - Custom model fine-tuning pipeline
+
+2. Enhanced RAG Capabilities
+   - Document library integration
+   - Knowledge base creation and management
+   - Improved context retention between sessions
+
+3. Expanded Accessibility
+   - Mobile-friendly interface optimizations
+   - Potential secure remote access options
+   - Multi-user profile management for family members
+   - Distro-agnostic deployment scripts
+
+# Logical Dependency Chain
+1. Foundation (Phase 1)
+   - Create installation script for Docker and NVIDIA Container Toolkit
+   - Test Docker installation with basic containers
+   - Verify GPU passthrough functionality
+   - Create docker-compose.yml file for services
+
+2. Core Functionality (Phase 2)
+   - Deploy Ollama container with GPU passthrough
+   - Configure volume for model persistence
+   - Download and configure initial Llama3 7B Q4 KM model
+   - Deploy OpenWebUI container with connection to Ollama
+
+3. User Experience (Phase 3)
+   - Configure personal workspace in OpenWebUI
+   - Set up voice chat functionality
+   - Add Phi3-mini as a fast-response alternative model
+   - Test family access on local network
+
+4. Optimization (Phase 4)
+   - Add Deepseek model for complex reasoning tasks
+   - Fine-tune GPU utilization across different models
+   - Optimize memory usage for multiple loaded models
+   - Implement efficient context sharing between LLMs
+
+# Risks and Mitigations  
+1. Technical Challenges
+   - Risk: Docker and NVIDIA Container Toolkit installation issues
+     - Mitigation: Create detailed installation script with error handling
+     - Mitigation: Include verification steps to confirm proper installation
+   
+   - Risk: GPU passthrough configuration issues in Docker
+     - Mitigation: Test with simple GPU containers before deploying Ollama
+     - Mitigation: Document multiple approaches to GPU configuration
+   
+   - Risk: Memory limitations with larger models like Deepseek
+     - Mitigation: Implement appropriate quantization levels
+     - Mitigation: Configure resource limits in docker-compose.yml
+
+2. MVP Scope
+   - Risk: Feature creep extending development time
+     - Mitigation: Focus on core deployment and basic model functionality first
+     - Mitigation: Document enhancement ideas for post-MVP phases
+   
+   - Risk: Performance expectations vs. hardware capabilities
+     - Mitigation: Start with well-optimized models (Llama3 7B Q4 KM, Phi3-mini)
+     - Mitigation: Benchmark different quantization levels for optimal performance
+
+3. Resource Constraints
+   - Risk: GPU memory limitations (8GB VRAM)
+     - Mitigation: Prioritize models known to work well within 8GB VRAM
+     - Mitigation: Use appropriate quantization (Q4) for larger models
+   
+   - Risk: Disk space for multiple large models
+     - Mitigation: Implement model rotation strategy if needed
+     - Mitigation: Monitor disk usage and clean unused model files
+
+# Appendix  
+- Technical Specifications
+  - Docker Installation Script Example:
+    ```bash
+    #!/bin/bash
+    # Script to install Docker and NVIDIA Container Toolkit on Ubuntu
+    
+    # Update package index
+    sudo apt-get update
+    
+    # Install prerequisites
+    sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
+    
+    # Add Docker's official GPG key
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    
+    # Add Docker repository
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    
+    # Update package index again
+    sudo apt-get update
+    
+    # Install Docker CE
+    sudo apt-get install -y docker-ce docker-ce-cli containerd.io
+    
+    # Add current user to docker group
+    sudo usermod -aG docker $USER
+    
+    # Install Docker Compose
+    sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+    sudo chmod +x /usr/local/bin/docker-compose
+    
+    # Install NVIDIA Container Toolkit
+    distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+    curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+    curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+    sudo apt-get update
+    sudo apt-get install -y nvidia-container-toolkit
+    
+    # Restart Docker daemon
+    sudo systemctl restart docker
+    
+    echo "Installation complete. You may need to log out and back in for group changes to take effect."
+    ```
+  
+  - Docker Compose Example:
+    ```yaml
+    version: '3.8'
+    
+    services:
+      ollama:
+        image: ollama/ollama:latest
+        container_name: ollama
+        restart: unless-stopped
+        ports:
+          - "11434:11434"
+        volumes:
+          - ollama_data:/root/.ollama
+        deploy:
+          resources:
+            reservations:
+              devices:
+                - driver: nvidia
+                  count: 1
+                  capabilities: [gpu]
+    
+      openwebui:
+        image: ghcr.io/open-webui/open-webui:latest
+        container_name: openwebui
+        restart: unless-stopped
+        ports:
+          - "3000:3000"
+        environment:
+          - OLLAMA_API_BASE_URL=http://ollama:11434
+          - OPENAI_API_KEY=
+          - DATABASE_URL=file:/app/data/database.sqlite
+        volumes:
+          - openwebui_data:/app/data
+        depends_on:
+          - ollama
+    
+    volumes:
+      ollama_data:
+      openwebui_data:
+    ```
+  
+  - Recommended Models for RTX 3070 (8GB VRAM):
+    - Llama3 7B Q4 KM: Good balance of performance and quality
+    - Phi3-mini: Fast responses, lower resource usage
+    - Deepseek (quantized): For complex reasoning tasks
+  
+  - Memory Usage Estimates:
+    - Llama3 7B Q4: ~4GB VRAM
+    - Phi3-mini: ~2GB VRAM
+    - Deepseek (depending on size and quantization): 5-7GB VRAM
+</PRD>
