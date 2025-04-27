@@ -5,6 +5,9 @@
 
 set -e
 
+USER=${REMOTE_USER:-$USER}
+USER=${USER:-$(whoami)}
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -87,27 +90,8 @@ check_nvidia_container_toolkit() {
 install_docker() {
     print_info "Installing Docker..."
     
-    # Update package index
-    apt-get update
-    
-    # Install prerequisites
-    apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-    
-    # Add Docker's official GPG key
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-    
-    # Set up the stable repository
-    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-    
-    # Update package index again with new repository
-    apt-get update
-    
-    # Install Docker Engine
-    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    
-    # Enable and start Docker service
-    systemctl enable docker
-    systemctl start docker
+    curl -fsSL https://get.docker.com | sh
+    sudo systemctl --now enable docker
     
     print_success "Docker installed successfully"
 }
@@ -138,20 +122,19 @@ install_nvidia_container_toolkit() {
     print_info "Installing NVIDIA Container Toolkit..."
     
     # Install prerequisites
-    apt-get install -y curl
+    apt install -y curl
     
     # Add NVIDIA Container Toolkit GPG key
-    curl -s -L https://nvidia.github.io/nvidia-container-runtime/gpgkey | apt-key add -
+    curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+    curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+      sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+      tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+    # Experimental features are not enabled by default
+    sed -i -e '/experimental/ s/^#//g' /etc/apt/sources.list.d/nvidia-container-toolkit.list
     
-    # Setup apt repository
-    distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
-    curl -s -L https://nvidia.github.io/nvidia-container-runtime/$distribution/nvidia-container-runtime.list | tee /etc/apt/sources.list.d/nvidia-container-runtime.list
-    
-    # Update package index
-    apt-get update
-    
-    # Install NVIDIA Container Toolkit
-    apt-get install -y nvidia-container-toolkit
+    apt update
+    apt install -y nvidia-container-toolkit
     
     # Configure Docker to use NVIDIA Container Runtime
     nvidia-ctk runtime configure --runtime=docker
@@ -197,7 +180,7 @@ verify_nvidia_container_toolkit() {
     print_info "Verifying NVIDIA Container Toolkit..."
     
     # Run NVIDIA Container Toolkit test
-    if docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi > /dev/null 2>&1; then
+    if docker run --rm --gpus all nvidia/cuda:12.8.1-cudnn-runtime-ubuntu20.04 nvidia-smi > /dev/null 2>&1; then
         print_success "NVIDIA Container Toolkit verification passed"
         return 0
     else
