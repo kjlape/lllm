@@ -15,7 +15,7 @@ services:
         reservations:
           devices:
             - driver: nvidia
-              count: 1
+              count: all
               capabilities: [gpu]
     environment:
       - OLLAMA_HOST=0.0.0.0
@@ -43,9 +43,6 @@ services:
       - openwebui_data:/app/backend/data
     environment:
       - OLLAMA_BASE_URL=http://ollama:11434
-      - WEBUI_AUTH=true
-      - DATABASE_URL=file:///app/backend/data/openwebui.db
-      - WEBUI_BIND_ADDRESS=0.0.0.0
     depends_on:
       ollama-healthcheck:
         condition: service_completed_successfully
