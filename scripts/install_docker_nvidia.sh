@@ -68,11 +68,11 @@ print_error() {
 
 log_cmd() {
     if [ "$VERBOSE" = true ]; then
-        echo -e "\n[$(date +"%Y-%m-%d %H:%M:%S")] Executing: $@" >> "$LOG_FILE"
-        eval "$@" 2>&1 | tee -a "$LOG_FILE"
+        echo -e "\n[$(date +"%Y-%m-%d %H:%M:%S")] Executing: $*" >> "$LOG_FILE"
+        eval "$*" 2>&1 | tee -a "$LOG_FILE"
         return ${PIPESTATUS[0]}
     else
-        eval "$@" >> "$LOG_FILE" 2>&1
+        eval "$*" >> "$LOG_FILE" 2>&1
         return $?
     fi
 }
@@ -384,10 +384,10 @@ add_user_to_docker_group() {
     fi
     
     print_info "Adding user $SUDO_USER to docker group..."
-    if groups $SUDO_USER | grep -q docker; then
+    if groups "$SUDO_USER" | grep -q docker; then
         print_success "User $SUDO_USER is already in the docker group"
     else
-        log_cmd usermod -aG docker $SUDO_USER
+        log_cmd usermod -aG docker "$SUDO_USER"
         print_success "User $SUDO_USER added to docker group"
         print_info "You may need to log out and log back in for this to take effect"
     fi
@@ -514,7 +514,7 @@ install_nvidia_container_toolkit() {
         else
             print_error "NVIDIA Container Toolkit installation verification failed"
             exit 1
-        }
+        fi
     else
         print_info "Skipping NVIDIA Container Toolkit installation as it's already installed and configured"
     fi
@@ -616,5 +616,4 @@ main() {
     print_info "You can use the following command to verify GPU passthrough: docker run --rm --gpus all nvidia/cuda:11.0-base nvidia-smi"
 }
 
-# Run the main function
-main "$@"
+install_nvidia_container_toolkit
