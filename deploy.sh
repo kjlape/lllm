@@ -42,7 +42,7 @@ cmd_setup() {
 }
 
 cmd_deploy() {
-    "$LIBEXEC_DIR/deploy.sh" "$2"
+    "$LIBEXEC_DIR/deploy.sh" "$1"
 }
 
 cmd_status() {

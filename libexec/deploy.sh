@@ -27,7 +27,7 @@ deploy() {
     # Copy compose files to remote server
     print_info "Copying Docker Compose configuration to remote server..."
     scp -P ${SSH_PORT:-22} -r "$REPO_ROOT/compose/"* "$REMOTE_USER@$REMOTE_HOST:$DEPLOY_DIR/compose/"
-    
+
     # Deploy with Docker Compose
     print_info "Deploying containers with Docker Compose..."
     ssh -t -p ${SSH_PORT:-22} "$REMOTE_USER@$REMOTE_HOST" "cd $DEPLOY_DIR/compose && docker compose up -d"
@@ -38,6 +38,17 @@ deploy() {
     
     print_success "Deployment completed successfully!"
     print_info "OpenWebUI should now be accessible at http://$REMOTE_HOST:${OPENWEBUI_PORT:-3000}"
+}
+
+pull() {
+    check_required_vars
+    
+    print_info "Pulling images..."
+    
+    # Pull latest images
+    ssh -p ${SSH_PORT:-22} "$REMOTE_USER@$REMOTE_HOST" "cd $DEPLOY_DIR/compose && docker compose pull"
+    
+    print_success "Images pulled successfully!"
 }
 
 # Function to handle container rollback
@@ -73,6 +84,8 @@ rollback() {
 # Check if we're rolling back or deploying
 if [ "$1" == "rollback" ]; then
     rollback
+elif [ "$1" == "pull" ]; then
+    pull
 else
     # Create backup of current deployment if it exists
     check_required_vars
